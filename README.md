@@ -121,11 +121,19 @@ should we expect any particular **geometric or statistical structure**
 (e.g., recurring radii, phase locking, or clustering)  
 to emerge as \( N \to \infty \) or as \( p \) varies?
 
-### What we found- The √p Ring Pattern
+### What we found  √p rings (p-adic self-similarity)
 
-All trajectories end at (0, 0).  
-But in the interim, there are striking orbital structures.  
-Heat maps of spatial density reveal **systematic rings at radius \( r = \sqrt{p} \)** for each mode \( p \).  
-For example, for the alternating series (\( p = 2 \)), a dark ring consistently appears at \( r = \sqrt{2} \),  
-where each walk touches and "orbits."
+Fix a zero s = 1/2 + i t_k and integer p ≥ 2. With coefficients a_n = 1 − p·1_{p|n},
+the partial sums satisfy the two-scale identity
+S_N(s,p) = T(N) − p^{1−s} T(⌊N/p⌋),  T(x)=∑_{n≤x} n^{-s}.
 
+Define W_N := N^{1/2} e^{i t_k log N} S_N(s,p). Then, keeping the discrete
+boundary term, one obtains the coarse recursion
+W_{pM} = W_M − (p−1)/2 + O(M^{-1}).
+
+Consequences:
+- self-similarity under N ↦ pN with scale p^{-1/2} and rotation −t_k log p,
+- log-periodic build-up in the radial density at radii forming a geometric ladder
+  r_m ∝ (√p)^m   (so consecutive rings obey r_{m+1}/r_m = √p).
+Stacking many zeros randomizes phase and leaves circular annuli at those radii.
+For p=2 (alternating case) the dominant ring is at r ≈ √2.
