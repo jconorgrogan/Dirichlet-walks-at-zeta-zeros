@@ -1,6 +1,6 @@
-# Visual-of-5000-Riemann-zeta-zeros-alternating--series-on-complex-plane
+# Dirichlet Walk: A Visual-of-5000-Riemann-zeta-zeros-alternating--series-on-complex-plane
 
-A (to my knowledge) unique/novel way of visualizing the zeta zeros 
+A (to my knowledge) unique/novel way of visualizing the zeta zeros  
 
 <img width="480" height="954" alt="image" src="https://github.com/user-attachments/assets/f6268d77-71cf-4509-8c1d-f512be9cdeae" />
 
@@ -8,17 +8,124 @@ A (to my knowledge) unique/novel way of visualizing the zeta zeros
 
 This project visualizes the complex-plane trajectories of partial sums evaluated at nontrivial Riemann zeta zeros.
 
-For each zero ρₖ = ½ + itₖ and mode parameter p, we compute:
+For each zero \( \rho_k = \tfrac{1}{2} + i t_k \) and mode parameter \( p \), we compute:
 
-$$S_N(t_k, p) = \sum_{n=1}^{N} M_p(n) \cdot n^{-1/2} \cdot e^{-i t_k \log n}$$
+\[
+S_N(t_k, p) = \sum_{n=1}^{N} M_p(n) \cdot n^{-1/2} \cdot e^{-i t_k \log n}
+\]
 
 where the multiplier is:
 
-$$M_p(n) = \begin{cases}
+\[
+M_p(n) =
+\begin{cases}
 1 - p, & \text{if } p \mid n \\
-1, & \text{otherwise}
-\end{cases}$$
+1, & \text{otherwise.}
+\end{cases}
+\]
 
-### The √p Ring Pattern
+---
+---
 
-The trajectory of all end at 0,0. But in the interim there are interesting orbits. there is a dense ringHeat maps of spatial density reveal **systematic rings at radius r = √p** for each mode p, eg for the alternating series we see a dark ring form at sqrt(2) where each and every walk touches and "orbits"
+## Here's what we did and what we asked:
+
+1. **Take a list of nontrivial Riemann zeros**
+
+\[
+\rho_k = \tfrac{1}{2} + i\,t_k, \quad k = 1, 2, \dots, K,
+\]
+
+where each \( t_k \) is the imaginary ordinate of a zeta zero  
+(e.g., \( t_1 = 14.1347, \; t_2 = 21.0220, \dots \)).
+
+---
+
+2. **For each zero, define the truncated series**
+
+The base Dirichlet-type sum on the critical line is
+
+\[
+S_N(t_k, p) = \sum_{n=1}^{N} M_p(n)\,n^{-1/2}\,e^{-i\,t_k \log n},
+\]
+
+where \( M_p(n) \) is a mode-dependent multiplier determined by the chosen
+`seriesType` value \( p \):
+
+\[
+M_p(n) =
+\begin{cases}
+1, & p = 1,\\[4pt]
+(1 - p), & n \equiv 0 \pmod p, \; p > 1,\\[4pt]
+1, & \text{otherwise.}
+\end{cases}
+\]
+
+---
+
+**Code equivalent:**
+```js
+if (p > 1) {
+  const multiplier = (n % p === 0) ? (1 - p) : 1;
+  re *= multiplier;
+  im *= multiplier;
+}
+```
+
+---
+
+3. **Compute the trajectory**
+
+Iteratively update:
+
+\[
+S_0 = 0, \quad
+S_n = S_{n-1} + M_p(n)\, n^{-1/2} e^{-i t_k \log n}.
+\]
+
+**Code:**
+```js
+z += Math.pow(n, -0.5) * M_p(n) * Math.exp(-i * t_k * Math.log(n));
+points.push([Re(z), Im(z)]);
+```
+
+Each term is a complex vector of length \( 1 / n^{1/2} \),
+rotated by angle \( t_k \log n \) and optionally phase-flipped or rescaled by \( M_p(n) \).
+
+---
+
+4. **Compute and visualize the walk**
+
+By the end of the loop, the script has all points
+\[
+(x_n, y_n) = (\Re S_n, \Im S_n)
+\]
+for each zero \( t_k \) and mode \( p \).
+
+These points trace a **zeta spiral** — a quasi-random walk whose step length decreases as \( 1 / n^{1/2} \).
+
+---
+
+5. **Analyze spatial and radial densities**
+
+The program then visualizes and measures:
+
+- \( H(x,y) \): a 2-D heat map showing where the walk spends time (brightness ∝ density).  
+- \( D(r) \): a 1-D radial density showing how often the walk crosses each radius \( r = |S_n| \).
+
+---
+
+### Question
+
+Given this definition of \( S_N(t_k, p) \) and the corresponding trajectories in the complex plane,  
+should we expect any particular **geometric or statistical structure**  
+(e.g., recurring radii, phase locking, or clustering)  
+to emerge as \( N \to \infty \) or as \( p \) varies?
+
+### What we found- The √p Ring Pattern
+
+All trajectories end at (0, 0).  
+But in the interim, there are striking orbital structures.  
+Heat maps of spatial density reveal **systematic rings at radius \( r = \sqrt{p} \)** for each mode \( p \).  
+For example, for the alternating series (\( p = 2 \)), a dark ring consistently appears at \( r = \sqrt{2} \),  
+where each walk touches and "orbits."
+
