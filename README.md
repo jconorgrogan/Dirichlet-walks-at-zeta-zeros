@@ -19,6 +19,6 @@ $$M_p(n) = \begin{cases}
 1, & \text{otherwise}
 \end{cases}$$
 
-### The √p Depletion Pattern
+### The √p Ring Pattern
 
-Heat maps of spatial density reveal **systematic rings at radius r = √p** for each mode p, eg for the alternating series we see a dark ring form at sqrt(2) where each and every walk "orbits"
+The trajectory of all end at 0,0. But in the interim there are interesting orbits. there is a dense ringHeat maps of spatial density reveal **systematic rings at radius r = √p** for each mode p, eg for the alternating series we see a dark ring form at sqrt(2) where each and every walk touches and "orbits"
