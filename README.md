@@ -136,3 +136,18 @@ Consequences:
   r_m ∝ (√p)^m   (so consecutive rings obey r_{m+1}/r_m = √p).
 Stacking many zeros randomizes phase and leaves circular annuli at those radii.
 For p=2 (alternating case) the dominant ring is at r ≈ √2.
+
+# The Dirichlet Walk Conjecture
+
+Let the trajectory of a "Dirichlet Walk" be defined by the sequence of partial sums $S_N(s, p)$ in the complex plane, where:
+
+$$S_N(s, p) = \sum_{n=1}^{N} M_p(n) \cdot n^{-s}, \quad \text{with } M_p(n) = \begin{cases} 1 - p & \text{if } p \mid n \\ 1 & \text{otherwise} \end{cases}$$
+
+A complex number `s` generates a **stable, origin-centered ring** if the spatial density of the points in its trajectory forms a well-defined, high-density annulus centered at the origin.
+
+**The conjecture is that a complex number `s` generates such a ring if and only if it is a zero of the function $L(s, p) = (1 - p^{1-s})\zeta(s)$.**
+
+This implies that the only numbers that produce this specific geometric signature are:
+
+1.  The non-trivial zeros of the Riemann zeta function, $\zeta(s)$.
+2.  The zeros of the factor $(1 - p^{1-s})$, which lie on the line $\Re(s) = 1$.
