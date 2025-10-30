@@ -7,141 +7,146 @@ A (to my knowledge) unique/novel way of visualizing the zeta zeros
 
 This project visualizes the complex-plane trajectories of partial sums evaluated at nontrivial Riemann zeta zeros.
 
-For each zero \( \rho_k = \tfrac{1}{2} + i t_k \) and mode parameter \( p \), we compute:
 
+# A First-Principles Reformulation of the Riemann Hypothesis via Alternating Walks
+
+## 0) Domain and Objects
+- **Critical strip:** work only with complex numbers \( s = \sigma + it \) where \( 0 < \sigma < 1 \).
+- **Alternating Dirichlet series (Dirichlet eta):**
+  \[
+    \eta(s) = \sum_{n=1}^{\infty} (-1)^{n-1} n^{-s}
+    = (1 - 2^{\,1-s}) \zeta(s).
+  \]
+  For all \( \Re(s) > 0 \), this series converges (conditionally if \( \sigma \le 1 \)).
+- **Partial sums (“walk”):**
+  \[
+    S_N(s) = \sum_{n=1}^{N} (-1)^{n-1} n^{-s}.
+  \]
+
+## 1) Fundamental Facts
+- **(F1)** Limit of the walk: For all \( \Re(s) > 0 \), \( S_N(s) \to \eta(s) \).
+- **(F2)** Zero correspondence in the strip: If \( 0 < \Re(s) < 1 \),
+  \[
+    \eta(s) = 0 \quad \Longleftrightarrow \quad \zeta(s) = 0,
+  \]
+  since \( 1 - 2^{\,1-s} \neq 0 \) in the open strip (its zeros lie on \( \Re(s)=1 \)).
+
+## 2) Geometric Reading
+- Plot \( S_N(s) \) in the complex plane as \( N = 1,2,3,\dots \).
+- By (F1), the walk converges to \( \eta(s) \).
+- By (F2), inside the strip:
+  \[
+    \text{“Walk ends at origin”} \iff \text{\( s \) is a nontrivial zero of } \zeta(s).
+  \]
+
+## 3) First-Principles Reformulation (Exact Equivalence)
+> **Riemann Hypothesis (RH)** ⇔  
+> Among all \( s \) with \( 0 < \Re(s) < 1 \),  
+> the only Dirichlet walks \( S_N(s) \) that converge to the origin  
+> are exactly those whose \( s \) lie on the critical line \( \Re(s) = \tfrac12 \).
+
+Formally:
 \[
-S_N(t_k, p) = \sum_{n=1}^{N} M_p(n) \cdot n^{-1/2} \cdot e^{-i t_k \log n}
+\text{RH} \;\Longleftrightarrow\;
+\Big(0<\Re s<1\ \text{and}\ S_N(s)\to0\Big)
+\iff
+\Big(\Re s=\tfrac12\ \text{and}\ \zeta(s)=0\Big).
 \]
 
-where the multiplier is:
+## 4) Minimal Proof Sketch
+- **(RH ⇒ Walk):** If RH holds, every nontrivial zero satisfies \( \Re s = \tfrac12 \).  
+  For those \( s \), \( \eta(s)=0 \), hence \( S_N(s)\to0 \).  
+  For others, \( \eta(s)\neq0 \), so the walk ends elsewhere.
+- **(Walk ⇒ RH):** If only points on \( \Re s=\tfrac12 \) yield \( S_N(s)\to0 \),  
+  then all nontrivial zeros lie on that line — which is RH.
 
-\[
-M_p(n) =
-\begin{cases}
-1 - p, & \text{if } p \mid n \\
-1, & \text{otherwise.}
-\end{cases}
-\]
+## 5) Implementation Checklist
+- Restrict to \( 0 < \Re(s) < 1 \).
+- Use the **alternating** Dirichlet series (not the plain zeta series).
+- Detect “walk to origin” by monitoring \( |S_N(s)| \to 0 \).
+- Treat the zeros of \( 1 - 2^{1-s} \) separately (they lie on \( \Re(s)=1 \)).
 
 ---
----
 
-## Here's what we did and what we asked:
-
-1. **Take a list of nontrivial Riemann zeros**
-
+## 6) The Dirichlet Walk as a Total Structure
+The eta function can be viewed as the **sum of all possible limiting walks**:
 \[
-\rho_k = \tfrac{1}{2} + i\,t_k, \quad k = 1, 2, \dots, K,
+\eta(s) = \lim_{N\to\infty} S_N(s).
 \]
+Each \( S_N(s) \) is a partial projection of the infinite pattern \( ((-1)^{n-1} n^{-s})_{n\ge1} \).
+Together, these projections reconstruct the entire analytic object \( \eta(s) \).
 
-where each \( t_k \) is the imaginary ordinate of a zeta zero  
-(e.g., \( t_1 = 14.1347, \; t_2 = 21.0220, \dots \)).
-
----
-
-2. **For each zero, define the truncated series**
-
-The base Dirichlet-type sum on the critical line is
-
+At the zeros \( \rho \):
 \[
-S_N(t_k, p) = \sum_{n=1}^{N} M_p(n)\,n^{-1/2}\,e^{-i\,t_k \log n},
+\eta(\rho)=0=\lim_{N\to\infty} S_N(\rho),
 \]
-
-where \( M_p(n) \) is a mode-dependent multiplier determined by the chosen
-`seriesType` value \( p \):
-
-\[
-M_p(n) =
-\begin{cases}
-1, & p = 1,\\[4pt]
-(1 - p), & n \equiv 0 \pmod p, \; p > 1,\\[4pt]
-1, & \text{otherwise.}
-\end{cases}
-\]
+so each corresponding walk converges precisely to the origin.
+Each zero is thus a point where the *local walk* coincides with the *global null structure* it helps define — a self-referential closure of the analytic totality.
 
 ---
 
-**Code equivalent:**
-```js
-if (p > 1) {
-  const multiplier = (n % p === 0) ? (1 - p) : 1;
-  re *= multiplier;
-  im *= multiplier;
-}
-Compute the trajectory
-Iteratively update:
+## 7) Duality with the Hadamard Product
+The same function can be expressed multiplicatively via its zeros:
+\[
+\xi(s) = e^{A+Bs} \prod_{\rho}\! \Big(1 - \frac{s}{\rho}\Big) e^{s/\rho}.
+\]
+Hence:
+- The **Dirichlet walk** is additive and constructive — term-by-term accumulation.
+- The **Hadamard product** is multiplicative and spectral — the total self-encoded via its zeros.
 
-[
-S_0 = 0, \quad S_n = S_{n-1} + M_p(n) , n^{-1/2} e^{-i t_k \log n}.
-]
+They are dual codings of the same function:  
+the walk *builds* the structure; the product *encodes* it as a self-annihilating whole.
 
-Code:
+---
 
-js
-z += Math.pow(n, -0.5) * M_p(n) * Math.exp(-i * t_k * Math.log(n));
-points.push([Re(z), Im(z)]);
-Each term is a complex vector of length (1/n^{1/2}),
-rotated by angle (t_k \log n) and optionally phase-flipped or rescaled by (M_p(n)).
+## 8) Conceptual Synthesis
+- The **Dirichlet walk** is the additive, generative side of \( \eta(s) \).
+- The **zero set** marks where local walks converge to the origin.
+- The **Hadamard product** is its multiplicative mirror.
+Together they define a closed informational loop:
 
-Compute and visualize the walk
-By the end of the loop, the script has all points
+> **The analytic totality is the sum of all limiting walks,  
+> and it vanishes precisely at the points that define its own closure.**
 
-[
-(x_n, y_n) = (\Re S_n, \Im S_n)
-]
+---
 
-for each zero (t_k) and mode (p).
+## Addendum: Empirical Observation on the Geometry of Dirichlet Walks
 
-These points trace a zeta spiral — a quasi-random walk whose step length decreases as (1/n^{1/2}).
+For many known zeros \( \rho = \tfrac12 + it_\rho \) and finite \( N \),
+\[
+S_N(\rho) = \sum_{n=1}^{N} (-1)^{n-1} n^{-\rho}
+\]
+forms a quasi-random trajectory in the complex plane.  
+Superposing these trajectories for thousands of zeros yields a striking **ring-shaped density** centered at the origin with radius ≈ √2.
 
-Analyze spatial and radial densities
-The program then visualizes and measures:
+### Empirical Interpretation
+- Each walk step has length \( n^{-1/2} \) and angle \( -t_\rho \log n \).
+- Averaging over many zeros randomizes the phases, revealing a stable **statistical geometry**.
+- The dense ring near √2 marks the equilibrium between collapse (\( \sigma>\tfrac12 \)) and divergence (\( \sigma<\tfrac12 \)).
+- This pattern persists across zeros and heights, suggesting an **invariant radial distribution** characteristic of the critical line.
 
-(H(x,y)): a 2-D heat map showing where the walk spends time (brightness ∝ density).
-(D(r)): a 1-D radial density showing how often the walk crosses each radius (r = |S_n|).
-Question
-Given this definition of (S_N(t_k, p)) and the corresponding trajectories in the complex plane,
-should we expect any particular geometric or statistical structure
-(e.g., recurring radii, phase locking, or clustering)
-to emerge as (N \to \infty) or as (p) varies?
+---
 
-What we found: √p rings (discrete scale invariance)
-Fix a zero (s = \frac{1}{2} + i t_k) and integer (p \geq 2). With coefficients (a_n = 1 - p \cdot 1_{p \mid n}),
-the partial sums satisfy the two-scale identity
+## **Dirichlet-Walk Invariant Distribution Conjecture**
+There exists a limiting radial probability distribution \( \mu(r) \) for the normalized magnitudes
+\[
+\frac{|S_N(\tfrac12 + it_\rho)|}{\sqrt{\log N}},
+\]
+as \( N \to \infty \) and \( \rho \) ranges over nontrivial zeros, such that:
+\[
+\mu(r) \text{ has a dominant peak near } r \approx \sqrt{2},
+\]
+and is invariant under translations in \( t_\rho \) and under scaling of \( N \).
 
-[
-S_N(s, p) = T(N) - p^{1-s} T(\lfloor N/p \rfloor), \quad T(x) = \sum_{n \leq x} n^{-s}.
-]
+### Meaning
+- The critical line represents a **dynamical equilibrium** of the Dirichlet walk.
+- The invariant radial law expresses the *statistical stationarity* of additive convergence at \( \Re(s)=\tfrac12 \).
+- The Riemann Hypothesis can thus be interpreted as the statement that:
+  > *Only on \( \Re(s)=\tfrac12 \) does the Dirichlet walk admit a stationary, invariant radial distribution.*
 
-Define (W_N := N^{1/2} e^{i t_k \log N} S_N(s, p)). Keeping the discrete boundary term, one obtains the asymptotic
+---
 
-[
-W_N = -\frac{2}{p-1} + O(N^{-1}) \Rightarrow W_{pM} = W_M + O(M^{-1}).
-]
-
-Consequences:
-
-self-similarity under (N \mapsto pN) with scale (p^{-1/2}) and rotation (-t_k \log p),
-log-periodic build-up in the radial density at radii forming a geometric ladder (r_m \propto (\sqrt{p})^m) (enumerating outward by earlier steps; equivalently, for increasing (N): (|S_{pN}| \approx p^{-1/2} |S_N|)).
-Stacking many zeros randomizes phase and leaves circular annuli at those radii.
-For (p = 2) (alternating case) adjacent rings are separated by a factor (\sqrt{2}).
-
-The Dirichlet Walk Conjecture
-Let the trajectory of a "Dirichlet Walk" be defined by the sequence of partial sums (S_N(s, p)) in the complex plane, where:
-
-[
-S_N(s, p) = \sum_{n=1}^{N} M_p(n) \cdot n^{-s}, \quad \text{with } M_p(n) =
-\begin{cases}
-1 - p & \text{if } p \mid n \
-1 & \text{otherwise.}
-\end{cases}
-]
-
-A complex number (s) generates a stable, origin-centered ring if the spatial density of the points in its trajectory forms a well-defined, high-density annulus centered at the origin.
-
-The conjecture is that a complex number (s) generates such a ring if and only if it is a zero of the function (L(s, p) = (1 - p^{1-s}) \zeta(s)).
-
-This implies that the only numbers that produce this specific geometric signature are:
-
-The non-trivial zeros of the Riemann zeta function, (\zeta(s)).
-The zeros of the factor ((1 - p^{1-s})), which lie on the line (\Re(s) = 1).
+### Summary
+This project reformulates RH through the geometry of additive convergence.  
+The “Dirichlet walk” provides a first-principles, constructive lens on the zeta function,  
+where the critical line emerges as the unique equilibrium of a complex-valued stochastic process.
